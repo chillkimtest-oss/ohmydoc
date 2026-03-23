@@ -1,0 +1,391 @@
+/**
+ * Resume / Cover Letter Render Styles — modern.css spec
+ *
+ * Styles the custom XML elements produced by the AI pipeline:
+ *   <document>, <header>, <name>, <contact>, <experience>, etc.
+ *
+ * These custom elements are rendered as HTML via DOMPurify + v-html.
+ * The browser treats unknown elements as inline by default, so each
+ * element that needs block-level layout must have display set explicitly.
+ *
+ * Design spec:
+ *   Font:      Inter, 'DM Sans', system-ui, -apple-system, sans-serif
+ *   Name:      22px / 700
+ *   Sections:  13px / 600 / ALL CAPS / letter-spacing 0.05em / subtle separator
+ *   Body:      13px / 400 / line-height 1.5
+ *   Contact:   12px / #555
+ *   Layout:    max-width 800px, padding 48px 64px
+ */
+
+/* ── Custom element resets ── */
+document, header, name, contact,
+email, phone, location, linkedin, website,
+summary, experience, role, title, company, period,
+bullets, bullet, education, degree, school, year, note,
+skills, certifications, projects, volunteer,
+date, recipient, greeting, body, paragraph, closing, signature {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Wrapper applied to the rendered content via .document-render ── */
+.document-render {
+  font-family: Inter, 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #111;
+  background: #fff;
+}
+
+/* ── document root ── */
+.document-render document {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 64px;
+  background: #fff;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 4px 16px 0 rgba(15, 23, 42, 0.06);
+  border-radius: 2px;
+}
+
+/* ── header block ── */
+.document-render header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── applicant name ── */
+.document-render name {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.4rem;
+  color: #111;
+}
+
+/* ── contact row ── */
+.document-render contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  font-size: 12px;
+  color: #555;
+}
+
+.document-render email,
+.document-render phone,
+.document-render location,
+.document-render linkedin,
+.document-render website {
+  display: inline;
+}
+
+/* ── section labels via pseudo-elements ── */
+.document-render summary::before,
+.document-render experience::before,
+.document-render education::before,
+.document-render skills::before,
+.document-render certifications::before,
+.document-render projects::before,
+.document-render volunteer::before {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #444;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.85rem;
+  margin-top: 0;
+}
+
+.document-render summary::before    { content: "Summary"; }
+.document-render experience::before { content: "Experience"; }
+.document-render education::before  { content: "Education"; }
+.document-render skills::before     { content: "Skills"; }
+.document-render certifications::before { content: "Certifications"; }
+.document-render projects::before   { content: "Projects"; }
+.document-render volunteer::before  { content: "Volunteer"; }
+
+/* ── section spacing ── */
+.document-render summary,
+.document-render experience,
+.document-render education,
+.document-render skills,
+.document-render certifications,
+.document-render projects,
+.document-render volunteer {
+  margin-bottom: 1.5rem;
+}
+
+/* ── summary paragraph text ── */
+.document-render summary {
+  color: #111;
+}
+
+/* ── experience roles ── */
+.document-render role {
+  margin-bottom: 1.1rem;
+}
+
+.document-render role:last-child {
+  margin-bottom: 0;
+}
+
+/* ── role header: title + period on same line via flexbox ── */
+.document-render role > title,
+.document-render role > period {
+  display: inline-block;
+}
+
+.document-render role {
+  position: relative;
+}
+
+/* Use a flex row for title + period using a pseudo wrapper approach via display flex on role */
+.document-render role > title {
+  display: inline;
+  font-weight: 600;
+  font-size: 13px;
+  color: #111;
+}
+
+.document-render role > company {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 0.1rem;
+}
+
+/* Title + period on same line: role acts as flex container for title/period */
+.document-render role {
+  display: block;
+}
+
+/* We achieve "title left, period right" by wrapping them in a flex row */
+/* Since we control the XML schema, we wrap via CSS trick: title + period as a pseudo flex row */
+/* We use a separate div approach — but since we can't add wrappers, we use display:flex on role */
+/* and constrain bullets to be display:block to break out */
+.document-render role > bullets {
+  display: block;
+  flex: 0 0 100%;
+}
+
+/* Flex layout for role row: title + period */
+.document-render role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.5rem;
+}
+
+/* Force company and bullets to take full width */
+.document-render role > company,
+.document-render role > bullets {
+  flex: 0 0 100%;
+}
+
+/* Period pushes to the right */
+.document-render role > period {
+  margin-left: auto;
+  font-size: 13px;
+  color: #555;
+  white-space: nowrap;
+}
+
+/* ── bullets list ── */
+.document-render bullets {
+  padding-left: 1.25rem;
+  margin-top: 0.35rem;
+}
+
+.document-render bullet {
+  display: list-item;
+  list-style-type: disc;
+  color: #111;
+  margin-bottom: 0.2rem;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+/* ── education ── */
+.document-render degree {
+  font-weight: 600;
+  font-size: 13px;
+  color: #111;
+}
+
+.document-render school,
+.document-render year,
+.document-render note {
+  color: #555;
+  font-size: 13px;
+}
+
+/* ── flat text sections ── */
+.document-render skills,
+.document-render certifications,
+.document-render projects,
+.document-render volunteer {
+  color: #111;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+/* ── links ── */
+.document-render a {
+  color: #0f6fec;
+  text-decoration: none;
+}
+
+/* ══════════════════════════════════════════════
+   Cover Letter styles  (document[type="cover-letter"])
+   ══════════════════════════════════════════════ */
+
+/* Shared header reuse — contact inline for letter too */
+.document-render document[type="cover-letter"] header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.document-render document[type="cover-letter"] contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  font-size: 12px;
+  color: #555;
+}
+
+/* Date line */
+.document-render document[type="cover-letter"] date {
+  font-size: 13px;
+  color: #555;
+  margin-top: 2rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Recipient block */
+.document-render recipient {
+  margin-bottom: 1.5rem;
+  font-size: 13px;
+  color: #111;
+  line-height: 1.6;
+}
+
+.document-render recipient > name {
+  font-weight: 600;
+}
+
+.document-render recipient > title,
+.document-render recipient > company,
+.document-render recipient > address {
+  color: #555;
+}
+
+/* Greeting */
+.document-render greeting {
+  font-size: 13px;
+  color: #111;
+  margin-bottom: 1rem;
+}
+
+/* Body paragraphs */
+.document-render body {
+  margin-bottom: 1rem;
+}
+
+.document-render paragraph {
+  font-size: 13px;
+  color: #111;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.document-render paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Closing + signature */
+.document-render closing {
+  font-size: 13px;
+  color: #111;
+  margin-top: 1.5rem;
+}
+
+.document-render signature {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  margin-top: 3rem;
+}
+
+/* ── Print ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 0.75in;
+  }
+
+  .document-render document {
+    padding: 0;
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .document-render header {
+    border-bottom-color: #d1d5db;
+  }
+
+  .document-render summary::before,
+  .document-render experience::before,
+  .document-render education::before,
+  .document-render skills::before,
+  .document-render certifications::before,
+  .document-render projects::before,
+  .document-render volunteer::before {
+    border-bottom-color: #d1d5db;
+  }
+
+  .document-render role,
+  .document-render education {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .document-render summary,
+  .document-render experience,
+  .document-render skills {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .document-render a {
+    color: #111 !important;
+    text-decoration: none !important;
+  }
+
+  /* Ensure colors render in print */
+  .document-render name { color: #111 !important; }
+  .document-render contact { color: #555 !important; }
+}
+
+/* ── Responsive ── */
+@media screen and (max-width: 768px) {
+  .document-render document {
+    padding: 1.5rem 1rem;
+  }
+
+  .document-render name {
+    font-size: 18px;
+  }
+
+  .document-render contact {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}
